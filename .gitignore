@@ -10,6 +10,29 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+# FMOD build and cache files (generated locally)
+**/Build/*
+**/Cache/*
+**/.cache/
+**/*.bank
+
+# FMOD metadata caches
+**/.user
+**/.unsaved
+**/desktop.ini
+
+# FMOD Studio's backup and autosave files
+**/Backups/*
+**/*.fspro.user
+**/*.lock
+
+# Optional: ignore FMOD logs
+**/Logs/*
+
+# Optional: if you're not using Source Control integration
+**/.fmodignore
+
+
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
