@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{cc4b527c-8c1d-412d-959f-e2869b559c39}">
+		<property name="assetPath">
+			<value>Eminem_-_Lose_Yourself_Offset_Noize__Stravy_Remix.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>202.65600000000001</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{3f8cb4ff-5813-4bc4-a443-9968ec675a5e}</destination>
+		</relationship>
+	</object>
+</objects>
