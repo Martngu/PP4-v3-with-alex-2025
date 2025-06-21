@@ -22,11 +22,16 @@ public class BeatTracker : MonoBehaviour
     public GameObject enemyPrefab;       // Assign in Inspector
     public Transform[] spawnPoints;      // Assign multiple spawn points in Inspector
 
-    private List<Transform> availableSpawnPoints = new List<Transform>();
+    private int currentSpawnIndex = 0;
     private bool spawnRequest = false;
+
+    private List<Transform> availableSpawnPoints = new List<Transform>();
 
     void Start()
     {
+        // Initialize available spawn points list
+        availableSpawnPoints.AddRange(spawnPoints);
+
         // Create and start music instance
         musicInstance = RuntimeManager.CreateInstance(musicEvent);
 
@@ -35,14 +40,11 @@ public class BeatTracker : MonoBehaviour
         musicInstance.setCallback(markerCallback, EVENT_CALLBACK_TYPE.TIMELINE_MARKER);
 
         musicInstance.start();
-
-        // Fill available spawn points list
-        availableSpawnPoints.AddRange(spawnPoints);
     }
 
     void Update()
     {
-        if (spawnRequest)
+        if (spawnRequest && GameManager.Instance.isPlayerAlive)
         {
             spawnRequest = false;
             SpawnEnemy();
@@ -58,9 +60,9 @@ public class BeatTracker : MonoBehaviour
             TimelineMarkerProperties marker = (TimelineMarkerProperties)Marshal.PtrToStructure(parameterPtr, typeof(TimelineMarkerProperties));
             string markerName = Marshal.PtrToStringAnsi(marker.name);
 
-            if (markerName == "Beat")
+            if (markerName.StartsWith("beat", StringComparison.OrdinalIgnoreCase))
             {
-                Debug.Log("Beat detected at position: " + marker.position);
+                Debug.Log("Beat detected at position: " + marker.position + " markerName: " + markerName);
                 spawnRequest = true;
             }
         }
@@ -70,31 +72,33 @@ public class BeatTracker : MonoBehaviour
 
     void SpawnEnemy()
     {
-        if (availableSpawnPoints.Count == 0)
+        if (spawnPoints.Length == 0)
         {
-            Debug.LogWarning("No available spawn points left!");
+            Debug.LogWarning("No spawn points assigned.");
             return;
         }
 
-        // Pick a random available spawn point
-        int randomIndex = UnityEngine.Random.Range(0, availableSpawnPoints.Count);
-        Transform chosenSpawnPoint = availableSpawnPoints[randomIndex];
+        Transform chosenSpawnPoint = spawnPoints[currentSpawnIndex];
 
-        // Spawn enemy
+        // Cycle to next spawn point
+        currentSpawnIndex = (currentSpawnIndex + 1) % spawnPoints.Length;
+
         GameObject enemy = Instantiate(enemyPrefab, chosenSpawnPoint.position, Quaternion.identity);
 
-        // Assign player to the enemy
-        enemy.GetComponent<EnemyChase>().player = GameObject.FindWithTag("Player").transform;
-
-        // Optional: Remember which spawn point this enemy used
         EnemyChase enemyChase = enemy.GetComponent<EnemyChase>();
         enemyChase.player = GameObject.FindWithTag("Player").transform;
-        enemyChase.spawnPoint = chosenSpawnPoint; // Needed if you want to free the spawn point later
-
-        // Remove the spawn point from the list
-        availableSpawnPoints.RemoveAt(randomIndex);
+        enemyChase.spawnPoint = chosenSpawnPoint;
 
         Debug.Log("Enemy spawned on beat at " + chosenSpawnPoint.position);
+    }
+
+    // Called by the enemy when it is destroyed
+    public void ReturnSpawnPoint(Transform spawnPoint)
+    {
+        if (!availableSpawnPoints.Contains(spawnPoint))
+        {
+            availableSpawnPoints.Add(spawnPoint);
+        }
     }
 
     void OnDestroy()
@@ -102,8 +106,12 @@ public class BeatTracker : MonoBehaviour
         musicInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
         musicInstance.release();
     }
-    public void ReturnSpawnPoint(Transform spawnPoint)
+    public void StopMusic()
     {
-        availableSpawnPoints.Add(spawnPoint);
+        if (musicInstance.isValid())
+        {
+            musicInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            musicInstance.release();
+        }
     }
 }
