@@ -75,4 +75,17 @@ public class EnemyChase : MonoBehaviour
             beatTracker.ReturnSpawnPoint(spawnPoint);
         }
     }
+    public void TakeDamage()
+    {
+        // Play enemy death effects here (particles, sound, animation)...
+
+        // Return spawn point to BeatTracker so that it can be reused
+        BeatTracker beatTracker = FindFirstObjectByType<BeatTracker>();
+        if (beatTracker != null)
+        {
+            beatTracker.ReturnSpawnPoint(spawnPoint);
+        }
+
+        Destroy(gameObject);
+    }
 }
