@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 public class BeatTracker : MonoBehaviour
 {
+    public static event Action OnBeat;           // Fires on every beat
+    public static event Action OnReloadBeat;     // Fires on reload-specific beats
+
     public EventReference musicEvent;
     private EventInstance musicInstance;
 
@@ -19,8 +22,8 @@ public class BeatTracker : MonoBehaviour
         public int position;
     }
 
-    public GameObject enemyPrefab;       // Assign in Inspector
-    public Transform[] spawnPoints;      // Assign multiple spawn points in Inspector
+    public GameObject enemyPrefab;
+    public Transform[] spawnPoints;
 
     private int currentSpawnIndex = 0;
     private bool spawnRequest = false;
@@ -29,13 +32,10 @@ public class BeatTracker : MonoBehaviour
 
     void Start()
     {
-        // Initialize available spawn points list
         availableSpawnPoints.AddRange(spawnPoints);
 
-        // Create and start music instance
         musicInstance = RuntimeManager.CreateInstance(musicEvent);
 
-        // Set callback for timeline markers
         markerCallback = new FMOD.Studio.EVENT_CALLBACK(BeatEventCallback);
         musicInstance.setCallback(markerCallback, EVENT_CALLBACK_TYPE.TIMELINE_MARKER);
 
@@ -60,10 +60,21 @@ public class BeatTracker : MonoBehaviour
             TimelineMarkerProperties marker = (TimelineMarkerProperties)Marshal.PtrToStructure(parameterPtr, typeof(TimelineMarkerProperties));
             string markerName = Marshal.PtrToStringAnsi(marker.name);
 
+            // General beat detection
             if (markerName.StartsWith("beat", StringComparison.OrdinalIgnoreCase))
             {
                 Debug.Log("Beat detected at position: " + marker.position + " markerName: " + markerName);
                 spawnRequest = true;
+
+                OnBeat?.Invoke();
+            }
+
+            // Reload beat detection
+            if (markerName.StartsWith("beat_reload", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("Reload Beat detected at position: " + marker.position + " markerName: " + markerName);
+
+                OnReloadBeat?.Invoke();
             }
         }
 
@@ -79,8 +90,6 @@ public class BeatTracker : MonoBehaviour
         }
 
         Transform chosenSpawnPoint = spawnPoints[currentSpawnIndex];
-
-        // Cycle to next spawn point
         currentSpawnIndex = (currentSpawnIndex + 1) % spawnPoints.Length;
 
         GameObject enemy = Instantiate(enemyPrefab, chosenSpawnPoint.position, Quaternion.identity);
@@ -92,7 +101,6 @@ public class BeatTracker : MonoBehaviour
         Debug.Log("Enemy spawned on beat at " + chosenSpawnPoint.position);
     }
 
-    // Called by the enemy when it is destroyed
     public void ReturnSpawnPoint(Transform spawnPoint)
     {
         if (!availableSpawnPoints.Contains(spawnPoint))
@@ -106,6 +114,7 @@ public class BeatTracker : MonoBehaviour
         musicInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
         musicInstance.release();
     }
+
     public void StopMusic()
     {
         if (musicInstance.isValid())
