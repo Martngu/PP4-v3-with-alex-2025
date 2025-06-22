@@ -76,7 +76,9 @@ public class GunController : MonoBehaviour
         }
 
         // Instantiate bullet and set velocity
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, transform.rotation);
+        Vector3 spawnOffset = transform.right * 0.5f; // 0.5 units in front of the gun
+        GameObject projectile = Instantiate(projectilePrefab, transform.position + spawnOffset, transform.rotation);
+
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
         rb.linearVelocity = transform.right * projectileSpeed;
 

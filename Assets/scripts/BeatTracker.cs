@@ -23,6 +23,7 @@ public class BeatTracker : MonoBehaviour
     }
 
     public GameObject enemyPrefab;
+    public GameObject dashEnemyPrefab;
     public Transform[] spawnPoints;
 
     private int currentSpawnIndex = 0;
@@ -92,14 +93,32 @@ public class BeatTracker : MonoBehaviour
         Transform chosenSpawnPoint = spawnPoints[currentSpawnIndex];
         currentSpawnIndex = (currentSpawnIndex + 1) % spawnPoints.Length;
 
-        GameObject enemy = Instantiate(enemyPrefab, chosenSpawnPoint.position, Quaternion.identity);
+        // Randomly decide which enemy to spawn (50/50 chance)
+        bool spawnDashEnemy = UnityEngine.Random.value > 0.5f;
 
-        EnemyChase enemyChase = enemy.GetComponent<EnemyChase>();
-        enemyChase.player = GameObject.FindWithTag("Player").transform;
-        enemyChase.spawnPoint = chosenSpawnPoint;
+        GameObject enemy;
 
-        Debug.Log("Enemy spawned on beat at " + chosenSpawnPoint.position);
+        if (spawnDashEnemy)
+        {
+            enemy = Instantiate(dashEnemyPrefab, chosenSpawnPoint.position, Quaternion.identity);
+
+            DashingEnemy dashEnemy = enemy.GetComponent<DashingEnemy>();
+            dashEnemy.SetTarget(GameObject.FindWithTag("Player").transform);
+
+            Debug.Log("Dash enemy spawned on beat at " + chosenSpawnPoint.position);
+        }
+        else
+        {
+            enemy = Instantiate(enemyPrefab, chosenSpawnPoint.position, Quaternion.identity);
+
+            EnemyChase enemyChase = enemy.GetComponent<EnemyChase>();
+            enemyChase.player = GameObject.FindWithTag("Player").transform;
+            enemyChase.spawnPoint = chosenSpawnPoint;
+
+            Debug.Log("Chase enemy spawned on beat at " + chosenSpawnPoint.position);
+        }
     }
+
 
     public void ReturnSpawnPoint(Transform spawnPoint)
     {

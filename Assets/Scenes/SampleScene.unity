@@ -819,6 +819,7 @@ MonoBehaviour:
       Data4: 2011334249
     Path: event:/Eminem_-_Lose_Yourself_Offset_Noize__Stravy_Remix
   enemyPrefab: {fileID: 2095087913856740138, guid: ebae0d8119bd80b41a5768e380af1994, type: 3}
+  dashEnemyPrefab: {fileID: 2095087913856740138, guid: 5e9416f0ba77a5645a824d681b44b530, type: 3}
   spawnPoints:
   - {fileID: 143708078}
   - {fileID: 1949047530}
@@ -1694,7 +1695,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1982038264}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e1fa34022a3e664780359a45fbfa28c, type: 3}
   m_Name: 

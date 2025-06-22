@@ -18,11 +18,19 @@ public class Projectile : MonoBehaviour
             {
                 enemy.TakeDamage();
             }
+
+            DashingEnemy dashEnemy = collision.GetComponent<DashingEnemy>();
+            if (dashEnemy != null)
+            {
+                dashEnemy.TakeDamage();
+            }
+
             Destroy(gameObject);
         }
         else if (collision.CompareTag("Obstacle"))
         {
-            Destroy(gameObject); // optional: destroy projectile on walls etc.
+            Destroy(gameObject);
         }
     }
+
 }
