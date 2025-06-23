@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{4732292c-1d10-4466-aa7f-8642c1e87efb}">
+		<property name="assetPath">
+			<value>The Grand Finale - Mario &amp; Luigi Bowser's Inside Story.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>189.17877551020408</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{3f8cb4ff-5813-4bc4-a443-9968ec675a5e}</destination>
+		</relationship>
+	</object>
+</objects>
