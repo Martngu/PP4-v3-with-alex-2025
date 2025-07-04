@@ -38,7 +38,7 @@ public class ProjectileEnemy : MonoBehaviour
 
             Destroy(gameObject);
         }
-        else if (collision.CompareTag("Obstacle") || collision.CompareTag("Boundary"))
+        else if (collision.CompareTag("Boundary"))
         {
             Destroy(gameObject);
         }
