@@ -7,8 +7,9 @@ using System.Collections.Generic;
 
 public class BeatTracker : MonoBehaviour
 {
-    public static event Action OnBeat;           // Fires on every beat
-    public static event Action OnReloadBeat;     // Fires on reload-specific beats
+    public static event Action OnBeat;
+    public static event Action OnReloadBeat;
+    public static event Action OnMove;
 
     public EventReference musicEvent;
     private EventInstance musicInstance;
@@ -24,6 +25,7 @@ public class BeatTracker : MonoBehaviour
 
     public GameObject enemyPrefab;
     public GameObject dashEnemyPrefab;
+    public GameObject warningPrefab;
     public Transform[] spawnPoints;
 
     private int currentSpawnIndex = 0;
@@ -61,21 +63,29 @@ public class BeatTracker : MonoBehaviour
             TimelineMarkerProperties marker = (TimelineMarkerProperties)Marshal.PtrToStructure(parameterPtr, typeof(TimelineMarkerProperties));
             string markerName = Marshal.PtrToStringAnsi(marker.name);
 
-            // General beat detection
-            if (markerName.StartsWith("beat", StringComparison.OrdinalIgnoreCase))
+            if (markerName.StartsWith("beat", StringComparison.OrdinalIgnoreCase) && !markerName.StartsWith("beat_reload", StringComparison.OrdinalIgnoreCase))
             {
                 Debug.Log("Beat detected at position: " + marker.position + " markerName: " + markerName);
                 spawnRequest = true;
-
                 OnBeat?.Invoke();
             }
 
-            // Reload beat detection
             if (markerName.StartsWith("beat_reload", StringComparison.OrdinalIgnoreCase))
             {
                 Debug.Log("Reload Beat detected at position: " + marker.position + " markerName: " + markerName);
-
                 OnReloadBeat?.Invoke();
+            }
+
+            if (markerName.StartsWith("move", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("Move marker detected at position: " + marker.position + " markerName: " + markerName);
+                OnMove?.Invoke();
+            }
+
+            if (markerName.StartsWith("spawn_warning", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("Spawn warning at marker: " + markerName);
+                ShowSpawnWarning();
             }
         }
 
@@ -93,9 +103,7 @@ public class BeatTracker : MonoBehaviour
         Transform chosenSpawnPoint = spawnPoints[currentSpawnIndex];
         currentSpawnIndex = (currentSpawnIndex + 1) % spawnPoints.Length;
 
-        // Randomly decide which enemy to spawn (50/50 chance)
         bool spawnDashEnemy = UnityEngine.Random.value > 0.5f;
-
         GameObject enemy;
 
         if (spawnDashEnemy)
@@ -119,6 +127,17 @@ public class BeatTracker : MonoBehaviour
         }
     }
 
+    void ShowSpawnWarning()
+    {
+        if (spawnPoints.Length == 0 || warningPrefab == null)
+        {
+            Debug.LogWarning("No spawn points or warning prefab assigned.");
+            return;
+        }
+
+        Transform warningPoint = spawnPoints[currentSpawnIndex];
+        Instantiate(warningPrefab, warningPoint.position, Quaternion.identity);
+    }
 
     public void ReturnSpawnPoint(Transform spawnPoint)
     {

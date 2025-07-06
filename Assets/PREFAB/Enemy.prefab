@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  speed: 1
+  speed: 4
   spawnPoint: {fileID: 0}
   separationRadius: 1
   separationStrength: 2

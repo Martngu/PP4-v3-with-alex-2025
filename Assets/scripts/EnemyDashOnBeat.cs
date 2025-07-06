@@ -16,27 +16,23 @@ public class DashingEnemy : MonoBehaviour
 
     private void OnEnable()
     {
-        BeatTracker.OnBeat += HandleBeat;
+        BeatTracker.OnMove += HandleMove;
     }
 
     private void OnDisable()
     {
-        BeatTracker.OnBeat -= HandleBeat;
+        BeatTracker.OnMove -= HandleMove;
     }
 
-    private void HandleBeat()
+    private void HandleMove()
     {
         if (player != null && GameManager.Instance.isPlayerAlive)
         {
             Vector3 chaseDirection = (player.position - transform.position).normalized;
 
-            // Apply separation like in EnemyChase
             Vector3 separationDirection = GetSeparationDirection();
-
-            // Combine dash and separation
             Vector3 finalDirection = (chaseDirection + separationDirection * separationStrength).normalized;
 
-            // Set target position for dash
             dashTarget = transform.position + finalDirection * dashDistance;
             isDashing = true;
         }
@@ -46,10 +42,8 @@ public class DashingEnemy : MonoBehaviour
     {
         if (isDashing)
         {
-            // Move towards dashTarget quickly
             transform.position = Vector3.MoveTowards(transform.position, dashTarget, dashSpeed * Time.deltaTime);
 
-            // Stop dashing when we reach the target
             if (Vector3.Distance(transform.position, dashTarget) < 0.1f)
             {
                 isDashing = false;
@@ -69,7 +63,7 @@ public class DashingEnemy : MonoBehaviour
                 Vector3 away = transform.position - collider.transform.position;
                 if (away != Vector3.zero)
                 {
-                    separation += away.normalized / away.magnitude; // closer enemies push harder
+                    separation += away.normalized / away.magnitude;
                 }
             }
         }
@@ -82,11 +76,7 @@ public class DashingEnemy : MonoBehaviour
         if (collision.gameObject.CompareTag("Player") && GameManager.Instance.isPlayerAlive)
         {
             Debug.Log("Player caught!");
-
-            // Call GameManager to handle death
             GameManager.Instance.PlayerDied();
-
-            // Disable the player
             collision.gameObject.SetActive(false);
         }
     }
@@ -108,9 +98,6 @@ public class DashingEnemy : MonoBehaviour
 
     public void TakeDamage()
     {
-        // Play enemy death effects here if needed
-
-        // Return spawn point to BeatTracker so that it can be reused
         BeatTracker beatTracker = FindFirstObjectByType<BeatTracker>();
         if (beatTracker != null)
         {

@@ -218,3 +218,4 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   separationRadius: 1
   separationStrength: 2
+  boundaryIgnoreTime: 1
