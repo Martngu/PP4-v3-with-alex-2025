@@ -100,6 +100,11 @@ public class BeatTracker2 : MonoBehaviour
 
                 SpawnLaser();
             }
+            if (markerName.Equals("end", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("END marker reached — level complete!");
+                GameManager.Instance.LevelComplete();
+            }
         }
 
         return FMOD.RESULT.OK;

@@ -87,6 +87,11 @@ public class BeatTracker : MonoBehaviour
                 Debug.Log("Spawn warning at marker: " + markerName);
                 ShowSpawnWarning();
             }
+            if (markerName.Equals("end", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("END marker reached — level complete!");
+                GameManager.Instance.LevelComplete();
+            }
         }
 
         return FMOD.RESULT.OK;
@@ -160,5 +165,9 @@ public class BeatTracker : MonoBehaviour
             musicInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             musicInstance.release();
         }
+    }
+    public EventInstance GetMusicInstance()
+    {
+        return musicInstance;
     }
 }
